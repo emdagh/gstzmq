@@ -1,0 +1,34 @@
+cmake_minimum_required(VERSION 3.8)
+project(gstzmq)
+
+set(CMAKE_BUILD_TYPE "Debug")
+set(CMAKE_BUILD_NAME "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_NAME}/${CMAKE_BUILD_TYPE}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${CMAKE_BUILD_NAME}/${CMAKE_BUILD_TYPE}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${CMAKE_BUILD_NAME}/${CMAKE_BUILD_TYPE}")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -O0 -ggdb")
+
+find_package(PkgConfig)
+
+pkg_check_modules(GSTREAMER REQUIRED
+    gstreamer-1.0
+    gstreamer-base-1.0
+)
+pkg_check_modules(GLIB REQUIRED glib-2.0)
+
+message("GSTREAMER_LINK_LIBRARIES=${GSTREAMER_LINK_LIBRARIES}")
+
+file(GLOB SRC src/*.cpp)
+
+add_library(${PROJECT_NAME} SHARED ${SRC})
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    ${GSTREAMER_LINK_LIBRARIES}
+    zmq
+    )
+target_include_directories(${PROJECT_NAME} PUBLIC
+    ${CMAKE_SOURCE_DIR}/include
+    ${GSTREAMER_INCLUDE_DIRS}
+    ${GLIB2_INCLUDE_DIRS}
+    )
